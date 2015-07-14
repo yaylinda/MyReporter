@@ -3,7 +3,7 @@ package linda.myreporter;
 import java.util.ArrayList;
 
 public enum Questions {
-    FEELING("On a scale of 1 (terrible) to 10 (wonderful) rate how you're currently feeling.", "FEELINGS", new ArrayList<String>()),
+    FEELING("On a scale of 1 (terrible) to 10 (wonderful) rate how you're currently feeling.", "FEELING", new ArrayList<String>()),
     LOCATION("Where are you?", "LOCATION", new ArrayList<String>()),
     EXCITED("Anything you are looking forward to in the coming week?", "EXCITEMENT", new ArrayList<String>()),
     STRESSED("Anything you are NOT looking forward to in the coming week?", "DREAD", new ArrayList<String>()),

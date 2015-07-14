@@ -30,6 +30,24 @@ public class StatsActivity extends Activity implements NavigationDrawerFragment.
      */
     private CharSequence mTitle;
 
+    private static final int OVERVIEW = 1;
+    private static final int FEELING = 2;
+    private static final int LOCATION = 3;
+    private static final int EXCITEMENT = 4;
+    private static final int DREAD = 5;
+    private static final int FOOD = 6;
+    private static final int DRUGS = 7;
+    private static final int PEOPLE = 8;
+    private static final int RELATIONSHIP = 9;
+    private static final int CLOTHES = 10;
+    private static final int WISH = 11;
+    private static final int SLEEP = 12;
+    private static final int EXERCISE = 13;
+    private static final int LEARN = 14;
+    private static final int PRODUCTIVITY = 15;
+    private static final int INTERACTIONS = 16;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -130,16 +148,92 @@ public class StatsActivity extends Activity implements NavigationDrawerFragment.
 
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+            View rootView;
+            String message;
             switch (fragmentNumber) {
-                case 1:
-                    View rootView = inflater.inflate(R.layout.overview_fragment_stats, container, false);
-                    String message = "You have answered a total of " + MainActivity.numEntries + " questions.";
+                case OVERVIEW:
+                    rootView = inflater.inflate(R.layout.overview_fragment_stats, container, false);
+                    message = "You have answered a total of " + MainActivity.numEntries + " questions. Select a question from the drawer on the left to see more insight and statistics about it.";
+                    ((TextView) rootView.findViewById(R.id.overview_text)).setText(message);
+                    return rootView;
+                case FEELING:
+                    rootView = inflater.inflate(R.layout.feeling_fragment_stats, container, false);
+                    message = "Question: " + Questions.values()[fragmentNumber-2].getQuestionText();
+                    ((TextView) rootView.findViewById(R.id.overview_text)).setText(message);
+                    return rootView;
+                case LOCATION:
+                    rootView = inflater.inflate(R.layout.location_fragment_stats, container, false);
+                    message = "Question: " + Questions.values()[fragmentNumber-2].getQuestionText();
+                    ((TextView) rootView.findViewById(R.id.overview_text)).setText(message);
+                    return rootView;
+                case EXCITEMENT:
+                    rootView = inflater.inflate(R.layout.excitement_fragment_stats, container, false);
+                    message = "Question: " + Questions.values()[fragmentNumber-2].getQuestionText();
+                    ((TextView) rootView.findViewById(R.id.overview_text)).setText(message);
+                    return rootView;
+                case DREAD:
+                    rootView = inflater.inflate(R.layout.dread_fragment_stats, container, false);
+                    message = "Question: " + Questions.values()[fragmentNumber-2].getQuestionText();
+                    ((TextView) rootView.findViewById(R.id.overview_text)).setText(message);
+                    return rootView;
+                case FOOD:
+                    rootView = inflater.inflate(R.layout.food_fragment_stats, container, false);
+                    message = "Question: " + Questions.values()[fragmentNumber-2].getQuestionText();
+                    ((TextView) rootView.findViewById(R.id.overview_text)).setText(message);
+                    return rootView;
+                case DRUGS:
+                    rootView = inflater.inflate(R.layout.drugs_fragment_stats, container, false);
+                    message = "Question: " + Questions.values()[fragmentNumber-2].getQuestionText();
+                    ((TextView) rootView.findViewById(R.id.overview_text)).setText(message);
+                    return rootView;
+                case PEOPLE:
+                    rootView = inflater.inflate(R.layout.people_fragment_stats, container, false);
+                    message = "Question: " + Questions.values()[fragmentNumber-2].getQuestionText();
+                    ((TextView) rootView.findViewById(R.id.overview_text)).setText(message);
+                    return rootView;
+                case RELATIONSHIP:
+                    rootView = inflater.inflate(R.layout.relationship_fragment_stats, container, false);
+                    message = "Question: " + Questions.values()[fragmentNumber-2].getQuestionText();
+                    ((TextView) rootView.findViewById(R.id.overview_text)).setText(message);
+                    return rootView;
+                case CLOTHES:
+                    rootView = inflater.inflate(R.layout.clothes_fragment_stats, container, false);
+                    message = "Question: " + Questions.values()[fragmentNumber-2].getQuestionText();
+                    ((TextView) rootView.findViewById(R.id.overview_text)).setText(message);
+                    return rootView;
+                case WISH:
+                    rootView = inflater.inflate(R.layout.wish_fragment_stats, container, false);
+                    message = "Question: " + Questions.values()[fragmentNumber-2].getQuestionText();
+                    ((TextView) rootView.findViewById(R.id.overview_text)).setText(message);
+                    return rootView;
+                case SLEEP:
+                    rootView = inflater.inflate(R.layout.sleep_fragment_stats, container, false);
+                    message = "Question: " + Questions.values()[fragmentNumber-2].getQuestionText();
+                    ((TextView) rootView.findViewById(R.id.overview_text)).setText(message);
+                    return rootView;
+                case EXERCISE:
+                    rootView = inflater.inflate(R.layout.exercise_fragment_stats, container, false);
+                    message = "Question: " + Questions.values()[fragmentNumber-2].getQuestionText();
+                    ((TextView) rootView.findViewById(R.id.overview_text)).setText(message);
+                    return rootView;
+                case LEARN:
+                    rootView = inflater.inflate(R.layout.learn_fragment_stats, container, false);
+                    message = "Question: " + Questions.values()[fragmentNumber-2].getQuestionText();
+                    ((TextView) rootView.findViewById(R.id.overview_text)).setText(message);
+                    return rootView;
+                case PRODUCTIVITY:
+                    rootView = inflater.inflate(R.layout.productivity_fragment_stats, container, false);
+                    message = "Question: " + Questions.values()[fragmentNumber-2].getQuestionText();
+                    ((TextView) rootView.findViewById(R.id.overview_text)).setText(message);
+                    return rootView;
+                case INTERACTIONS:
+                    rootView = inflater.inflate(R.layout.interactions_fragment_stats, container, false);
+                    message = "Pick two questions to see their correlation: ";
                     ((TextView) rootView.findViewById(R.id.overview_text)).setText(message);
                     return rootView;
                 default:
-                    rootView = inflater.inflate(R.layout.overview_fragment_stats, container, false);
-                    ((TextView) rootView.findViewById(R.id.overview_text)).setText("bye");
-                    return rootView;
+                    // should not get here
+                    return null;
             }
         }
 
