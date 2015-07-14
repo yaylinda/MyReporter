@@ -20,7 +20,7 @@
         android:layout_height="wrap_content"
         android:id="@android:id/list"
         android:layout_centerHorizontal="true"
-        android:layout_below="@id/headerText"
+        android:layout_below="@+id/headerText"
         android:choiceMode="none"
         android:drawSelectorOnTop="false">
     </ListView>

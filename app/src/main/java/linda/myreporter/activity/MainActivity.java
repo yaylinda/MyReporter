@@ -1,4 +1,4 @@
-package linda.myreporter;
+package linda.myreporter.activity;
 
 import android.app.AlertDialog;
 import android.app.ListActivity;
@@ -13,16 +13,25 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.RadioButton;
 import android.widget.SimpleCursorAdapter;
 
 import java.text.DateFormat;
 import java.util.Calendar;
 import java.util.Random;
 
+import linda.myreporter.Questions;
+import linda.myreporter.R;
+import linda.myreporter.database.AnswersDatabaseHelper;
+import linda.myreporter.database.QuestionsDatabase;
+import linda.myreporter.database.QuestionsDatabaseHelper;
+import linda.myreporter.service.NotificationService;
+
 
 public class MainActivity extends ListActivity {
 
-    private QuestionsDatabaseHelper helper = new QuestionsDatabaseHelper(MainActivity.this);
+    private QuestionsDatabaseHelper questionsHelper = new QuestionsDatabaseHelper(MainActivity.this);
+    private AnswersDatabaseHelper answersHelper = new AnswersDatabaseHelper(MainActivity.this);
     public static long numEntries;
 
     @Override
@@ -31,6 +40,7 @@ public class MainActivity extends ListActivity {
         setContentView(R.layout.activity_main);
         updateUI();
 
+        // todo: move to settings
         findViewById(R.id.clear_db_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -40,9 +50,9 @@ public class MainActivity extends ListActivity {
                 builder.setPositiveButton("YES", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        SQLiteDatabase db = helper.getWritableDatabase();
-                        helper.onUpgrade(db, 1, 1);
-                        updateUI();
+                        SQLiteDatabase db = questionsHelper.getWritableDatabase();
+                        questionsHelper.onUpgrade(db, 1, 1);
+                        MainActivity.this.updateUI();
                     }
                 });
                 builder.setNegativeButton("NO", null);
@@ -67,14 +77,17 @@ public class MainActivity extends ListActivity {
                 Random random = new Random();
                 final String question = Questions.values()[random.nextInt(Questions.values().length)].getQuestionText();
                 builder.setMessage(question);
-                final EditText inputField = new EditText(this);
-                builder.setView(inputField);
+//                final EditText inputField = new EditText(this);
+                final RadioButton option1 = new RadioButton(this);
+                option1.setText("button");
+                builder.setView(option1);
+                // TODO more buttons
                 builder.setPositiveButton("Add", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        String answer = inputField.getText().toString();
-                        helper = new QuestionsDatabaseHelper(MainActivity.this);
-                        SQLiteDatabase db = helper.getWritableDatabase();
+                        String answer = option1.getText().toString();
+                        questionsHelper = new QuestionsDatabaseHelper(MainActivity.this);
+                        SQLiteDatabase db = questionsHelper.getWritableDatabase();
                         ContentValues values = new ContentValues();
 
                         values.clear();
@@ -84,7 +97,7 @@ public class MainActivity extends ListActivity {
 
                         db.insertWithOnConflict(QuestionsDatabase.TABLE, null, values, SQLiteDatabase.CONFLICT_IGNORE);
 
-                        updateUI();
+                        MainActivity.this.updateUI();
                     }
                 });
                 builder.setNegativeButton("Cancel", null);
@@ -92,13 +105,17 @@ public class MainActivity extends ListActivity {
                 return true;
             case R.id.action_see_stats:
                 startActivity(new Intent(this, StatsActivity.class));
+                return true;
+            case R.id.action_settings:
+                startActivity(new Intent(this, SettingsActivity.class));
+                return true;
             default:
                 return false;
         }
     }
 
     private void updateUI() {
-        SQLiteDatabase db = helper.getReadableDatabase();
+        SQLiteDatabase db = questionsHelper.getReadableDatabase();
         Cursor cursor = db.query(QuestionsDatabase.TABLE,
                 new String[]{QuestionsDatabase.Columns._ID, QuestionsDatabase.Columns.DATE, QuestionsDatabase.Columns.QUESTION, QuestionsDatabase.Columns.ANSWER},
                 null, null, null, null, QuestionsDatabase.Columns._ID + " DESC");

@@ -1,4 +1,4 @@
-package linda.myreporter;
+package linda.myreporter.activity;
 
 
 import android.app.Activity;
@@ -25,6 +25,9 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import linda.myreporter.Questions;
+import linda.myreporter.R;
 
 /**
  * Fragment used for managing interactions for and presentation of a navigation drawer.

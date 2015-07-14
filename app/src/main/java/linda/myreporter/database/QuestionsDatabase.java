@@ -1,4 +1,4 @@
-package linda.myreporter;
+package linda.myreporter.database;
 
 import android.provider.BaseColumns;
 

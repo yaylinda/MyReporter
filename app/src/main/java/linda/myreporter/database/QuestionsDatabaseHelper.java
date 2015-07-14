@@ -1,13 +1,9 @@
-package linda.myreporter;
+package linda.myreporter.database;
 
-import android.app.Service;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
-
-import java.text.DateFormat;
-import java.util.Calendar;
 
 public class QuestionsDatabaseHelper extends SQLiteOpenHelper {
 
@@ -19,7 +15,7 @@ public class QuestionsDatabaseHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         String sqlQuery = String.format("CREATE TABLE %s (_id INTEGER PRIMARY KEY AUTOINCREMENT, %s TEXT, %s TEXT, %s TEXT)",
                 QuestionsDatabase.TABLE, QuestionsDatabase.Columns.DATE, QuestionsDatabase.Columns.QUESTION, QuestionsDatabase.Columns.ANSWER);
-        Log.d("QuestionsDatabaseHelper", "Query to form table: " + sqlQuery);
+        Log.d("QuestionsDatabaseHelper", "Query to create table: " + sqlQuery);
         db.execSQL(sqlQuery);
     }
 

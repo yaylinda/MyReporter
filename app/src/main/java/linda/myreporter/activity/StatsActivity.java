@@ -1,12 +1,10 @@
-package linda.myreporter;
+package linda.myreporter.activity;
 
 import android.app.Activity;
 
 import android.app.ActionBar;
 import android.app.Fragment;
 import android.app.FragmentManager;
-import android.database.DatabaseUtils;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -15,6 +13,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.support.v4.widget.DrawerLayout;
 import android.widget.TextView;
+
+import linda.myreporter.Questions;
+import linda.myreporter.R;
 
 
 public class StatsActivity extends Activity implements NavigationDrawerFragment.NavigationDrawerCallbacks {

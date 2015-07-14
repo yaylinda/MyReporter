@@ -1,19 +1,17 @@
-package linda.myreporter;
+package linda.myreporter.service;
 
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.app.TaskStackBuilder;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
-import android.widget.Toast;
 
-import java.text.DateFormat;
-import java.util.Calendar;
+import linda.myreporter.activity.MainActivity;
+import linda.myreporter.R;
 
 public class NotificationService extends Service {
 
