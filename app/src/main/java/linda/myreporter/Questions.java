@@ -3,46 +3,44 @@ package linda.myreporter;
 import java.util.ArrayList;
 
 public enum Questions {
-    FEELING("On a scale of 1 (terrible) to 10 (wonderful) rate how you're currently feeling.", "FEELING", new ArrayList<String>()),
-    LOCATION("Where are you?", "LOCATION", new ArrayList<String>()),
-    EXCITED("Anything you are looking forward to in the coming week?", "EXCITEMENT", new ArrayList<String>()),
-    STRESSED("Anything you are NOT looking forward to in the coming week?", "DREAD", new ArrayList<String>()),
-    FOOD("What have you eaten today?", "FOOD", new ArrayList<String>()),
-    CHEMICALS("Have you had any caffeine, alcohol, medication, or other drugs today?", "DRUGS", new ArrayList<String>()),
-    PEOPLE("Who are you with?", "PEOPLE", new ArrayList<String>()),
-    RELATIONSHIP("Do you currently feel happy about your relationship?", "RELATIONSHIP", new ArrayList<String>()),
-    CLOTHES("What are you wearing?", "CLOTHES", new ArrayList<String>()),
-    WISH("What is something you wish was true about your life right now?", "WISH", new ArrayList<String>()),
-    SLEEP("Good morning! How many hours do you think you slept last night?", "SLEEP", new ArrayList<String>()),
-    EXERCISE("Did you exercise today?", "EXERCISE", new ArrayList<String>()),
-    LEARN("Have you learned anything new in the past week?", "LEARN", new ArrayList<String>()),
-    PRODUCTIVITY("Did you feel that you were productive today?", "PRODUCTIVITY", new ArrayList<String>());
-
-    // TODO next step: categorize answers, and options for answers
-
+    FEELING("On a scale of 1 (terrible) to 5 (wonderful) rate how you're currently feeling.", new String[]{"1", "2", "3", "4", "5"}, false),
+    LOCATION("Where are you?", new String[]{"Home", "School", "Work", "Theater", "Restaurant", "Friend's house", "Store", "(Other)", true}),
+    EXCITED("Is there anything that you are looking forward to in the coming week?", new String[]{"Yes", "No"}, false),
+    STRESSED("Is there anything that you are NOT looking forward to in the coming week?", new String[]{"Yes", "No"}, false),
+    FOOD("What have you eaten today?", new String[]{"Meat", "Veggies", "Fruit", "Grains", "Sweets", "(Other)"}, true),
+    CHEMICALS("Have you had any caffeine, alcohol, medication, or other drugs today?", new String[]{"Caffeine", "Alcohol", "Weed", "Medication", "(Other)"}, true),
+    PEOPLE("Who are you with?", new String[]{"Myself", "Boyfriend", "Girlfriend", "Family", "(Other)"}, true),
+    RELATIONSHIP("Do you currently feel happy about your relationship?", new String[]{"Yes", "No"}, false),
+    CLOTHES("What are you wearing?", new String[]{"Dress", "Bath robe", "Nothing", "Normal clothes", "(Other)"}, true),
+    WISH("What is something you wish was true about your life right now?", new String[]{"(Other)"}, true),
+    SLEEP("Good morning! How many hours do you think you slept last night?", new String[]{"3-", "4", "5", "6", "7", "8", "9", "10+"}, false),
+    EXERCISE("Did you exercise today?", new String[]{"Yes", "No"}, false),
+    LEARN("Have you learned anything new in the past week?", new String[]{"Yes", "No"}, false),
+    PRODUCTIVITY("Did you feel that you were productive today?", new String[]{"Yes", "No"}, false);
+    
     private String question;
-    private String category;
-    private ArrayList<String> possibleAnswers;
+    private String[] possibleAnswers;
+    private boolean allowCustomAnswers;
 
-    Questions(String question, String category, ArrayList<String> possibleAnswers) {
+    Questions(String question, String[] possibleAnswers, boolean allowCustomAnswers) {
         this.question = question;
-        this.category = category;
         this.possibleAnswers = possibleAnswers;
+        this.allowCustomAnswers = allowCustomAnswers;
     }
 
     public String getQuestionText() {
         return question;
     }
 
-    public String getCategory() {
-        return category;
-    }
-
-    public ArrayList<String> getPossibleAnswers() {
+    public String[] getPossibleAnswers() {
         return possibleAnswers;
     }
 
     public void addPossibleAnswers(String newPossibleAnswer) {
-        this.possibleAnswers.add(newPossibleAnswer);
+        this.possibleAnswers[this.possibleAnswers.length] = newPossibleAnswer;
+    }
+
+    public boolean isAllowCustomAnswers() {
+        return allowCustomAnswers;
     }
 }
