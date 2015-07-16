@@ -74,7 +74,7 @@ public class StatsActivity extends Activity implements NavigationDrawerFragment.
         if (number == 1) {
             mTitle = getString(R.string.title_section_overview);
         } else if (number-1 <= Questions.values().length) {
-            mTitle = Questions.values()[number-2].getCategory();
+            mTitle = Questions.values()[number-2].toString();
         } else {
             mTitle = getString(R.string.title_section_interactions);
         }

@@ -1,9 +1,16 @@
 package linda.myreporter.database;
 
+import android.content.ContentValues;
 import android.content.Context;
+import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
+
+import java.text.DateFormat;
+import java.util.Calendar;
+
+import linda.myreporter.Questions;
 
 public class AnswersDatabaseHelper extends SQLiteOpenHelper {
     public AnswersDatabaseHelper(Context context) {
@@ -12,12 +19,24 @@ public class AnswersDatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        String sqlQuery = String.format("CREATE TABLE %s (_id INTEGER PRIMARY KEY AUTOINCREMENT, %s TEXT, %s TEXT, %s TEXT)",
+        // create table
+        String sqlQuery = String.format("CREATE TABLE %s (_id INTEGER PRIMARY KEY AUTOINCREMENT, %s TEXT, %s TEXT)",
                 AnswersDatabase.TABLE, AnswersDatabase.Columns.QUESTION, AnswersDatabase.Columns.ANSWERS);
-        Log.d("AnswersDatabaseHelper", "Query to create table: " + sqlQuery);
         db.execSQL(sqlQuery);
 
-        // TODO prepopulate database with questions and their associated answers
+        // insert values
+        ContentValues values = new ContentValues();
+        values.clear();
+        for (Questions question : Questions.values()) {
+            Log.d("AnswersDatabaseHelper", "inserting: " + question.getQuestionText() + ": " + question.getPossibleAnswers());
+            values.put(AnswersDatabase.Columns.QUESTION, question.getQuestionText());
+            values.put(AnswersDatabase.Columns.ANSWERS, question.getPossibleAnswers());
+            db.insertWithOnConflict(AnswersDatabase.TABLE, null, values, SQLiteDatabase.CONFLICT_IGNORE);
+        }
+
+
+        Log.d("MainActivity", "Number of entries in database: " + DatabaseUtils.queryNumEntries(db, AnswersDatabase.TABLE));
+        Log.d("AnswersDatabaseHelper", "creating answers table; pre-populating with answers");
     }
 
     @Override
