@@ -11,8 +11,26 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:id="@+id/overview_text"
+        android:id="@+id/question_text"
         android:layout_alignParentTop="true"
         android:layout_alignParentStart="true" />
+
+    <!--<org.achartengine.GraphicalView-->
+        <!--android:id="@+id/graph"-->
+        <!--android:layout_width="fill_parent"-->
+        <!--android:layout_height="fill_parent" />-->
+    <!--<com.androidplot.xy.XYPlot-->
+        <!--android:id="@+id/graph"-->
+        <!--android:layout_width="fill_parent"-->
+        <!--android:layout_height="fill_parent"-->
+        <!--android:layout_below="@+id/question_text"-->
+        <!--androidPlot.title="A Simple XY Plot"-->
+        <!--androidPlot.domainLabel="Domain"-->
+        <!--androidPlot.rangeLabel="Range"/>-->
+
+    <!--<com.jjoe64.graphview.GraphView-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="200dip"-->
+        <!--android:id="@+id/graph" />-->
 
 </RelativeLayout>

@@ -41,8 +41,9 @@ public class MainActivity extends ListActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        questionsHelper.onUpgrade(questionsHelper.getWritableDatabase(), 1, 1);
-        answersHelper.onUpgrade(answersHelper.getWritableDatabase(), 1, 1);
+        // to clear databases upon loading app
+//        questionsHelper.onUpgrade(questionsHelper.getWritableDatabase(), 1, 1);
+//        answersHelper.onUpgrade(answersHelper.getWritableDatabase(), 1, 1);
         
         updateUI();
 
@@ -78,53 +79,7 @@ public class MainActivity extends ListActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_add_question:
-                Log.d("MainActivity", "Add question pressed");
-                AlertDialog.Builder builder = new AlertDialog.Builder(this);
-//                builder.setTitle("Random Question");
-                Random random = new Random();
-                final String question = Questions.values()[random.nextInt(Questions.values().length)].getQuestionText();
-                builder.setTitle(question);
-                SQLiteDatabase answer_db = answersHelper.getReadableDatabase();
-                Cursor answersCursor = answer_db.query(AnswersDatabase.TABLE, new String[]{AnswersDatabase.Columns.ANSWERS}, AnswersDatabase.Columns.QUESTION + " == " + "\"" + question + "\"", null, null, null, null);
-                Log.d("MainActivity", "Column name: " + answersCursor.getColumnName(0));
-                Log.d("MainActivity", "Move to first successful? " + answersCursor.moveToFirst());
-                Log.d("MainActivity", "Number of entries in database: " + DatabaseUtils.queryNumEntries(answer_db, AnswersDatabase.TABLE));
-                String answersString = answersCursor.getString(0);
-                final String[] answersOptions = answersString.split(",");
-                final String[] selectedAnswer = new String[1];
-                Log.d("MainActivity", "Got answers: " + selectedAnswer);
-//                final RadioButton[] answersOptionsButtons = new RadioButton[answersOptions.length];
-//                int index = 0;
-//                for (String answer : answersOptions) {
-//                    RadioButton radioButton = new RadioButton(this);
-//                    radioButton.setText(answer);
-//                    answersOptionsButtons[index] = radioButton;
-//                    index++;
-//                }
-                builder = builder.setSingleChoiceItems(answersOptions, -1, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        selectedAnswer[0] = answersOptions[which];
-                    }
-                });
-                builder.setPositiveButton("Submit", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        SQLiteDatabase db = questionsHelper.getWritableDatabase();
-                        ContentValues values = new ContentValues();
-
-                        values.clear();
-                        values.put(QuestionsDatabase.Columns.DATE, DateFormat.getDateTimeInstance().format(Calendar.getInstance().getTime()));
-                        values.put(QuestionsDatabase.Columns.QUESTION, question);
-                        values.put(QuestionsDatabase.Columns.ANSWER, selectedAnswer[0]);
-
-                        db.insertWithOnConflict(QuestionsDatabase.TABLE, null, values, SQLiteDatabase.CONFLICT_IGNORE);
-
-                        MainActivity.this.updateUI();
-                    }
-                });
-                builder.setNegativeButton("Cancel", null);
-                builder.create().show();
+                displayQuestionDialogue();
                 return true;
             case R.id.action_see_stats:
                 startActivity(new Intent(this, StatsActivity.class));
@@ -137,7 +92,45 @@ public class MainActivity extends ListActivity {
         }
     }
 
-    private void updateUI() {
+    private void displayQuestionDialogue() {
+        Log.d("MainActivity", "Add question pressed");
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        Random random = new Random();
+        final String question = Questions.values()[random.nextInt(Questions.values().length)].getQuestionText();
+        builder.setTitle(question);
+        SQLiteDatabase answer_db = answersHelper.getReadableDatabase();
+        Cursor answersCursor = answer_db.query(AnswersDatabase.TABLE, new String[]{AnswersDatabase.Columns.ANSWERS}, AnswersDatabase.Columns.QUESTION + " == " + "\"" + question + "\"", null, null, null, null);
+        Log.d("MainActivity", "Column name: " + answersCursor.getColumnName(0));
+        Log.d("MainActivity", "Move to first successful? " + answersCursor.moveToFirst());
+        Log.d("MainActivity", "Number of entries in database: " + DatabaseUtils.queryNumEntries(answer_db, AnswersDatabase.TABLE));
+        String answersString = answersCursor.getString(0);
+        final String[] answersOptions = answersString.split(",");
+        final String[] selectedAnswer = new String[1];
+        Log.d("MainActivity", "Got answers: " + selectedAnswer);
+        builder = builder.setSingleChoiceItems(answersOptions, -1, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                selectedAnswer[0] = answersOptions[which];
+            }
+        });
+        builder.setPositiveButton("Submit", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                SQLiteDatabase db = questionsHelper.getWritableDatabase();
+                ContentValues values = new ContentValues();
+                values.clear();
+                values.put(QuestionsDatabase.Columns.DATE, DateFormat.getDateTimeInstance().format(Calendar.getInstance().getTime()));
+                values.put(QuestionsDatabase.Columns.QUESTION, question);
+                values.put(QuestionsDatabase.Columns.ANSWER, selectedAnswer[0]);
+                db.insertWithOnConflict(QuestionsDatabase.TABLE, null, values, SQLiteDatabase.CONFLICT_IGNORE);
+                MainActivity.this.updateUI();
+            }
+        });
+        builder.setNegativeButton("Cancel", null);
+        builder.create().show();
+    }
+
+    public void updateUI() {
         SQLiteDatabase db = questionsHelper.getReadableDatabase();
         Cursor cursor = db.query(QuestionsDatabase.TABLE,
                 new String[]{QuestionsDatabase.Columns._ID, QuestionsDatabase.Columns.DATE, QuestionsDatabase.Columns.QUESTION, QuestionsDatabase.Columns.ANSWER},
@@ -155,6 +148,5 @@ public class MainActivity extends ListActivity {
 
         numEntries = DatabaseUtils.queryNumEntries(db, QuestionsDatabase.TABLE);
         findViewById(R.id.clear_db_button).setEnabled(numEntries > 0);
-
     }
 }

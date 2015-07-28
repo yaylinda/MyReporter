@@ -1,21 +1,41 @@
 package linda.myreporter.activity;
 
-import android.app.Activity;
-
 import android.app.ActionBar;
+import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.support.v4.widget.DrawerLayout;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.support.v4.widget.DrawerLayout;
 import android.widget.TextView;
+
+import org.achartengine.ChartFactory;
+import org.achartengine.GraphicalView;
+import org.achartengine.chart.BarChart;
+import org.achartengine.model.CategorySeries;
+import org.achartengine.model.XYMultipleSeriesDataset;
+import org.achartengine.renderer.DefaultRenderer;
+import org.achartengine.renderer.SimpleSeriesRenderer;
+import org.achartengine.renderer.XYMultipleSeriesRenderer;
+import org.achartengine.renderer.XYSeriesRenderer;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import linda.myreporter.Questions;
 import linda.myreporter.R;
+import linda.myreporter.database.AnswersDatabase;
+import linda.myreporter.database.AnswersDatabaseHelper;
+import linda.myreporter.database.QuestionsDatabase;
+import linda.myreporter.database.QuestionsDatabaseHelper;
 
 
 public class StatsActivity extends Activity implements NavigationDrawerFragment.NavigationDrawerCallbacks {
@@ -47,6 +67,12 @@ public class StatsActivity extends Activity implements NavigationDrawerFragment.
     private static final int PRODUCTIVITY = 15;
     private static final int INTERACTIONS = 16;
 
+//    private QuestionsDatabaseHelper questionsHelper = new QuestionsDatabaseHelper(StatsActivity.this);
+//    private AnswersDatabaseHelper answersHelper = new AnswersDatabaseHelper(StatsActivity.this);
+//    private SQLiteDatabase questionsDB = questionsHelper.getReadableDatabase();
+//    private SQLiteDatabase answersDB = answersHelper.getReadableDatabase();
+
+    protected static Map<String, Map<String, Integer>> questionToAnswerToCount = new HashMap<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,6 +87,33 @@ public class StatsActivity extends Activity implements NavigationDrawerFragment.
         mNavigationDrawerFragment.setUp(
                 R.id.navigation_drawer,
                 (DrawerLayout) findViewById(R.id.drawer_layout));
+
+        // extract data for each question
+        QuestionsDatabaseHelper questionsHelper = new QuestionsDatabaseHelper(StatsActivity.this);
+        SQLiteDatabase questionsDB = questionsHelper.getReadableDatabase();
+        AnswersDatabaseHelper answersHelper = new AnswersDatabaseHelper(StatsActivity.this);
+        SQLiteDatabase answersDB = answersHelper.getReadableDatabase();
+        for (Questions question : Questions.values()) {
+            Map<String, Integer> answerToCount = new HashMap<>();
+            Cursor questionCursor = questionsDB.rawQuery("SELECT " + QuestionsDatabase.Columns.ANSWER + " FROM " + QuestionsDatabase.TABLE + " WHERE " + QuestionsDatabase.Columns.QUESTION + " == \"" + question.getQuestionText() + "\"", null);
+            Cursor answerCursor = answersDB.rawQuery("SELECT " + AnswersDatabase.Columns.ANSWERS + " FROM " + AnswersDatabase.TABLE + " WHERE " + AnswersDatabase.Columns.QUESTION + " == \"" + question.getQuestionText() + "\"", null);
+            answerCursor.moveToFirst();
+            String[] answersOptions = answerCursor.getString(0).split(",");
+            for (String answerOption : answersOptions) {
+                answerToCount.put(answerOption, 0);
+            }
+            if (questionCursor.moveToFirst()) {
+                String answer;
+                do {
+                    answer = questionCursor.getString(0);
+                    answerToCount.put(answer, answerToCount.get(answer) + 1);
+                } while (questionCursor.moveToNext());
+
+            }
+            questionToAnswerToCount.put(question.getQuestionText(), answerToCount);
+            Log.d("StatsActivity", "answerToCount for " + question + ": " + answerToCount);
+        }
+        Log.d("StatsActivity", "questionToAnswerToCount" + questionToAnswerToCount);
     }
 
     @Override
@@ -150,90 +203,96 @@ public class StatsActivity extends Activity implements NavigationDrawerFragment.
         public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
             View rootView;
             String message;
+            rootView = inflater.inflate(R.layout.overview_fragment_stats, container, false);
             switch (fragmentNumber) {
                 case OVERVIEW:
-                    rootView = inflater.inflate(R.layout.overview_fragment_stats, container, false);
-                    message = "You have answered a total of " + MainActivity.numEntries + " questions. Select a question from the drawer on the left to see more insight and statistics about it.";
+                    message = "You have answered a total of " + MainActivity.numEntries + " questions.\n\nSelect a question from the drawer on the left to see more insight and statistics about it.";
                     ((TextView) rootView.findViewById(R.id.overview_text)).setText(message);
                     return rootView;
-                case FEELING:
-                    rootView = inflater.inflate(R.layout.feeling_fragment_stats, container, false);
-                    message = "Question: " + Questions.values()[fragmentNumber-2].getQuestionText();
-                    ((TextView) rootView.findViewById(R.id.overview_text)).setText(message);
-                    return rootView;
-                case LOCATION:
-                    rootView = inflater.inflate(R.layout.location_fragment_stats, container, false);
-                    message = "Question: " + Questions.values()[fragmentNumber-2].getQuestionText();
-                    ((TextView) rootView.findViewById(R.id.overview_text)).setText(message);
-                    return rootView;
-                case EXCITEMENT:
-                    rootView = inflater.inflate(R.layout.excitement_fragment_stats, container, false);
-                    message = "Question: " + Questions.values()[fragmentNumber-2].getQuestionText();
-                    ((TextView) rootView.findViewById(R.id.overview_text)).setText(message);
-                    return rootView;
-                case DREAD:
-                    rootView = inflater.inflate(R.layout.dread_fragment_stats, container, false);
-                    message = "Question: " + Questions.values()[fragmentNumber-2].getQuestionText();
-                    ((TextView) rootView.findViewById(R.id.overview_text)).setText(message);
-                    return rootView;
-                case FOOD:
-                    rootView = inflater.inflate(R.layout.food_fragment_stats, container, false);
-                    message = "Question: " + Questions.values()[fragmentNumber-2].getQuestionText();
-                    ((TextView) rootView.findViewById(R.id.overview_text)).setText(message);
-                    return rootView;
-                case DRUGS:
-                    rootView = inflater.inflate(R.layout.drugs_fragment_stats, container, false);
-                    message = "Question: " + Questions.values()[fragmentNumber-2].getQuestionText();
-                    ((TextView) rootView.findViewById(R.id.overview_text)).setText(message);
-                    return rootView;
-                case PEOPLE:
-                    rootView = inflater.inflate(R.layout.people_fragment_stats, container, false);
-                    message = "Question: " + Questions.values()[fragmentNumber-2].getQuestionText();
-                    ((TextView) rootView.findViewById(R.id.overview_text)).setText(message);
-                    return rootView;
-                case RELATIONSHIP:
-                    rootView = inflater.inflate(R.layout.relationship_fragment_stats, container, false);
-                    message = "Question: " + Questions.values()[fragmentNumber-2].getQuestionText();
-                    ((TextView) rootView.findViewById(R.id.overview_text)).setText(message);
-                    return rootView;
-                case CLOTHES:
-                    rootView = inflater.inflate(R.layout.clothes_fragment_stats, container, false);
-                    message = "Question: " + Questions.values()[fragmentNumber-2].getQuestionText();
-                    ((TextView) rootView.findViewById(R.id.overview_text)).setText(message);
-                    return rootView;
-                case WISH:
-                    rootView = inflater.inflate(R.layout.wish_fragment_stats, container, false);
-                    message = "Question: " + Questions.values()[fragmentNumber-2].getQuestionText();
-                    ((TextView) rootView.findViewById(R.id.overview_text)).setText(message);
-                    return rootView;
-                case SLEEP:
-                    rootView = inflater.inflate(R.layout.sleep_fragment_stats, container, false);
-                    message = "Question: " + Questions.values()[fragmentNumber-2].getQuestionText();
-                    ((TextView) rootView.findViewById(R.id.overview_text)).setText(message);
-                    return rootView;
-                case EXERCISE:
-                    rootView = inflater.inflate(R.layout.exercise_fragment_stats, container, false);
-                    message = "Question: " + Questions.values()[fragmentNumber-2].getQuestionText();
-                    ((TextView) rootView.findViewById(R.id.overview_text)).setText(message);
-                    return rootView;
-                case LEARN:
-                    rootView = inflater.inflate(R.layout.learn_fragment_stats, container, false);
-                    message = "Question: " + Questions.values()[fragmentNumber-2].getQuestionText();
-                    ((TextView) rootView.findViewById(R.id.overview_text)).setText(message);
-                    return rootView;
-                case PRODUCTIVITY:
-                    rootView = inflater.inflate(R.layout.productivity_fragment_stats, container, false);
-                    message = "Question: " + Questions.values()[fragmentNumber-2].getQuestionText();
-                    ((TextView) rootView.findViewById(R.id.overview_text)).setText(message);
-                    return rootView;
+//                case FEELING:
+//                    rootView = inflater.inflate(R.layout.feeling_fragment_stats, container, false);
+//                    question = Questions.values()[fragmentNumber-2].getQuestionText();
+//
+//                    /*
+//                     * making the graph
+//                     */
+//                    container.addView(makeGraph(question));
+//
+//                    return rootView;
+//                case LOCATION:
+//                    rootView = inflater.inflate(R.layout.location_fragment_stats, container, false);
+//                    message = "Question: " + Questions.values()[fragmentNumber-2].getQuestionText();
+//                    ((TextView) rootView.findViewById(R.id.overview_text)).setText(message);
+//                    return rootView;
+//                case EXCITEMENT:
+//                    rootView = inflater.inflate(R.layout.excitement_fragment_stats, container, false);
+//                    message = "Question: " + Questions.values()[fragmentNumber-2].getQuestionText();
+//                    ((TextView) rootView.findViewById(R.id.overview_text)).setText(message);
+//                    return rootView;
+//                case DREAD:
+//                    rootView = inflater.inflate(R.layout.dread_fragment_stats, container, false);
+//                    message = "Question: " + Questions.values()[fragmentNumber-2].getQuestionText();
+//                    ((TextView) rootView.findViewById(R.id.overview_text)).setText(message);
+//                    return rootView;
+//                case FOOD:
+//                    rootView = inflater.inflate(R.layout.food_fragment_stats, container, false);
+//                    message = "Question: " + Questions.values()[fragmentNumber-2].getQuestionText();
+//                    ((TextView) rootView.findViewById(R.id.overview_text)).setText(message);
+//                    return rootView;
+//                case DRUGS:
+//                    rootView = inflater.inflate(R.layout.drugs_fragment_stats, container, false);
+//                    message = "Question: " + Questions.values()[fragmentNumber-2].getQuestionText();
+//                    ((TextView) rootView.findViewById(R.id.overview_text)).setText(message);
+//                    return rootView;
+//                case PEOPLE:
+//                    rootView = inflater.inflate(R.layout.people_fragment_stats, container, false);
+//                    message = "Question: " + Questions.values()[fragmentNumber-2].getQuestionText();
+//                    ((TextView) rootView.findViewById(R.id.overview_text)).setText(message);
+//                    return rootView;
+//                case RELATIONSHIP:
+//                    rootView = inflater.inflate(R.layout.relationship_fragment_stats, container, false);
+//                    message = "Question: " + Questions.values()[fragmentNumber-2].getQuestionText();
+//                    ((TextView) rootView.findViewById(R.id.overview_text)).setText(message);
+//                    return rootView;
+//                case CLOTHES:
+//                    rootView = inflater.inflate(R.layout.clothes_fragment_stats, container, false);
+//                    message = "Question: " + Questions.values()[fragmentNumber-2].getQuestionText();
+//                    ((TextView) rootView.findViewById(R.id.overview_text)).setText(message);
+//                    return rootView;
+//                case WISH:
+//                    rootView = inflater.inflate(R.layout.wish_fragment_stats, container, false);
+//                    message = "Question: " + Questions.values()[fragmentNumber-2].getQuestionText();
+//                    ((TextView) rootView.findViewById(R.id.overview_text)).setText(message);
+//                    return rootView;
+//                case SLEEP:
+//                    rootView = inflater.inflate(R.layout.sleep_fragment_stats, container, false);
+//                    message = "Question: " + Questions.values()[fragmentNumber-2].getQuestionText();
+//                    ((TextView) rootView.findViewById(R.id.overview_text)).setText(message);
+//                    return rootView;
+//                case EXERCISE:
+//                    rootView = inflater.inflate(R.layout.exercise_fragment_stats, container, false);
+//                    message = "Question: " + Questions.values()[fragmentNumber-2].getQuestionText();
+//                    ((TextView) rootView.findViewById(R.id.overview_text)).setText(message);
+//                    return rootView;
+//                case LEARN:
+//                    rootView = inflater.inflate(R.layout.learn_fragment_stats, container, false);
+//                    message = "Question: " + Questions.values()[fragmentNumber-2].getQuestionText();
+//                    ((TextView) rootView.findViewById(R.id.overview_text)).setText(message);
+//                    return rootView;
+//                case PRODUCTIVITY:
+//                    rootView = inflater.inflate(R.layout.productivity_fragment_stats, container, false);
+//                    message = "Question: " + Questions.values()[fragmentNumber-2].getQuestionText();
+//                    ((TextView) rootView.findViewById(R.id.overview_text)).setText(message);
+//                    return rootView;
                 case INTERACTIONS:
                     rootView = inflater.inflate(R.layout.interactions_fragment_stats, container, false);
                     message = "Pick two questions to see their correlation: ";
                     ((TextView) rootView.findViewById(R.id.overview_text)).setText(message);
                     return rootView;
                 default:
-                    // should not get here
-                    return null;
+                    String question = Questions.values()[fragmentNumber-2].getQuestionText();
+                    container.addView(makeGraph(question));
+                    return rootView;
             }
         }
 
@@ -242,6 +301,52 @@ public class StatsActivity extends Activity implements NavigationDrawerFragment.
             super.onAttach(activity);
             ((StatsActivity) activity).onSectionAttached(
                     getArguments().getInt(ARG_SECTION_NUMBER));
+        }
+
+        /**
+         *
+         * @param question
+         * @return
+         */
+        private GraphicalView makeGraph(String question) {
+            Map<String, Integer> answerToCount = questionToAnswerToCount.get(question);
+
+            int numAnswers = answerToCount.size();
+
+            Integer[] values = new Integer[numAnswers];
+            answerToCount.values().toArray(values);
+
+            String[] labels = new String[numAnswers];
+            answerToCount.keySet().toArray(labels);
+
+            int[] colors = {Color.RED, Color.YELLOW, Color.GREEN, Color.BLUE, Color.GRAY, Color.CYAN, Color.BLACK, Color.DKGRAY, Color.MAGENTA, Color.WHITE};
+
+            // make series
+            XYMultipleSeriesDataset dataset = new XYMultipleSeriesDataset();
+            for (int i = 0; i < numAnswers; i++) {
+                CategorySeries series = new CategorySeries(labels[i]);
+                series.add(labels[i], values[i]);
+                dataset.addSeries(i, series.toXYSeries());
+            }
+
+            // make renderer
+            XYMultipleSeriesRenderer renderer = new XYMultipleSeriesRenderer();
+            renderer.setChartTitle(question);
+            renderer.setXTitle("Answer");
+            renderer.setYTitle("Count");
+            renderer.setYAxisMin(0.0);
+            renderer.setYAxisMax(5.0); // TODO make this dynamic
+            renderer.setBarWidth(200);
+            renderer.setBarSpacing(10);
+            renderer.setDisplayValues(true);
+            for(int i = 0; i < numAnswers; i++) {
+                XYSeriesRenderer xySeriesRenderer = new XYSeriesRenderer();
+                xySeriesRenderer.setColor(colors[i]);
+                renderer.addSeriesRenderer(i, xySeriesRenderer);
+            }
+
+            // return chart object
+            return ChartFactory.getBarChartView(getActivity(), dataset, renderer, BarChart.Type.DEFAULT);
         }
     }
 
