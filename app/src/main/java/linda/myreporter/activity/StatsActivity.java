@@ -22,6 +22,8 @@ import org.achartengine.GraphicalView;
 import org.achartengine.chart.BarChart;
 import org.achartengine.model.CategorySeries;
 import org.achartengine.model.XYMultipleSeriesDataset;
+import org.achartengine.renderer.DefaultRenderer;
+import org.achartengine.renderer.SimpleSeriesRenderer;
 import org.achartengine.renderer.XYMultipleSeriesRenderer;
 import org.achartengine.renderer.XYSeriesRenderer;
 
@@ -204,6 +206,7 @@ public class StatsActivity extends Activity implements NavigationDrawerFragment.
             rootView = inflater.inflate(R.layout.overview_fragment_stats, container, false);
             switch (fragmentNumber) {
                 case OVERVIEW:
+                    container.removeAllViews();
                     message = "You have answered a total of " + MainActivity.numEntries + " questions.\n\nSelect a question from the drawer on the left to see more insight and statistics about it.";
                     ((TextView) rootView.findViewById(R.id.overview_text)).setText(message);
                     return rootView;
@@ -283,13 +286,16 @@ public class StatsActivity extends Activity implements NavigationDrawerFragment.
 //                    ((TextView) rootView.findViewById(R.id.overview_text)).setText(message);
 //                    return rootView;
                 case INTERACTIONS:
+                    container.removeAllViews();
                     rootView = inflater.inflate(R.layout.interactions_fragment_stats, container, false);
                     message = "Pick two questions to see their correlation: ";
                     ((TextView) rootView.findViewById(R.id.overview_text)).setText(message);
                     return rootView;
                 default:
                     String question = Questions.values()[fragmentNumber-2].getQuestionText();
-                    container.addView(makeGraph(question));
+                    container.removeAllViews();
+//                    container.addView(makeBarGraph(question));
+                    container.addView(makePieGraph(question));
                     return rootView;
             }
         }
@@ -306,7 +312,7 @@ public class StatsActivity extends Activity implements NavigationDrawerFragment.
          * @param question
          * @return
          */
-        private GraphicalView makeGraph(String question) {
+        private GraphicalView makeBarGraph(String question) {
             Map<String, Integer> answerToCount = questionToAnswerToCount.get(question);
 
             int numAnswers = answerToCount.size();
@@ -345,6 +351,46 @@ public class StatsActivity extends Activity implements NavigationDrawerFragment.
 
             // return chart object
             return ChartFactory.getBarChartView(getActivity(), dataset, renderer, BarChart.Type.DEFAULT);
+        }
+
+        private GraphicalView makePieGraph(String question) {
+            Map<String, Integer> answerToCount = questionToAnswerToCount.get(question);
+
+            int numAnswers = answerToCount.size();
+
+            Integer[] values = new Integer[numAnswers];
+            answerToCount.values().toArray(values);
+
+            String[] labels = new String[numAnswers];
+            answerToCount.keySet().toArray(labels);
+
+            int[] colors = {Color.RED, Color.YELLOW, Color.GREEN, Color.BLUE, Color.GRAY, Color.CYAN, Color.BLACK, Color.DKGRAY, Color.MAGENTA, Color.WHITE};
+
+            // Instantiating CategorySeries to plot Pie Chart
+            CategorySeries distributionSeries = new CategorySeries(question);
+            for (int i = 0; i < numAnswers; i++) {
+                // Adding a slice with its values and name to the Pie Chart
+                distributionSeries.add(labels[i], values[i]);
+            }
+
+            // Instantiating a renderer for the Pie Chart
+            DefaultRenderer defaultRenderer = new DefaultRenderer();
+            for (int i = 0; i < numAnswers; i++) {
+                SimpleSeriesRenderer seriesRenderer = new SimpleSeriesRenderer();
+                seriesRenderer.setColor(colors[i]);
+                //Adding colors to the chart
+                defaultRenderer.setBackgroundColor(Color.BLACK);
+                defaultRenderer.setApplyBackgroundColor(true);
+                // Adding a renderer for a slice
+                defaultRenderer.addSeriesRenderer(seriesRenderer);
+            }
+
+            defaultRenderer.setChartTitle(question);
+            defaultRenderer.setChartTitleTextSize(100);
+            defaultRenderer.setZoomButtonsVisible(false);
+
+
+            return ChartFactory.getPieChartView(getActivity(), distributionSeries, defaultRenderer);
         }
     }
 
