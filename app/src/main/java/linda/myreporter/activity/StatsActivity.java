@@ -27,7 +27,10 @@ import org.achartengine.renderer.SimpleSeriesRenderer;
 import org.achartengine.renderer.XYMultipleSeriesRenderer;
 import org.achartengine.renderer.XYSeriesRenderer;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import linda.myreporter.Questions;
@@ -356,26 +359,29 @@ public class StatsActivity extends Activity implements NavigationDrawerFragment.
         private GraphicalView makePieGraph(String question) {
             Map<String, Integer> answerToCount = questionToAnswerToCount.get(question);
 
-            int numAnswers = answerToCount.size();
-
-            Integer[] values = new Integer[numAnswers];
-            answerToCount.values().toArray(values);
-
-            String[] labels = new String[numAnswers];
-            answerToCount.keySet().toArray(labels);
+            List<String> labels = new ArrayList<>();
+            List<Integer> values = new ArrayList<>();
+            for (String label : answerToCount.keySet()) {
+                if (answerToCount.get(label) != 0) {
+                    Log.d("StatsActivity", "label: " + label);
+                    Log.d("StatsActivity", "value: " + answerToCount.get(label));
+                    labels.add(label);
+                    values.add(answerToCount.get(label));
+                }
+            }
 
             int[] colors = {Color.RED, Color.YELLOW, Color.GREEN, Color.BLUE, Color.GRAY, Color.CYAN, Color.BLACK, Color.DKGRAY, Color.MAGENTA, Color.WHITE};
 
             // Instantiating CategorySeries to plot Pie Chart
             CategorySeries distributionSeries = new CategorySeries(question);
-            for (int i = 0; i < numAnswers; i++) {
+            for (int i = 0; i < labels.size(); i++) {
                 // Adding a slice with its values and name to the Pie Chart
-                distributionSeries.add(labels[i], values[i]);
+                distributionSeries.add(labels.get(i), values.get(i));
             }
 
             // Instantiating a renderer for the Pie Chart
             DefaultRenderer defaultRenderer = new DefaultRenderer();
-            for (int i = 0; i < numAnswers; i++) {
+            for (int i = 0; i < labels.size(); i++) {
                 SimpleSeriesRenderer seriesRenderer = new SimpleSeriesRenderer();
                 seriesRenderer.setColor(colors[i]);
                 //Adding colors to the chart
