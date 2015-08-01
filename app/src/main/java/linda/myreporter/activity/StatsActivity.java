@@ -310,11 +310,59 @@ public class StatsActivity extends Activity implements NavigationDrawerFragment.
                     getArguments().getInt(ARG_SECTION_NUMBER));
         }
 
-        /**
-         *
-         * @param question
-         * @return
-         */
+        private GraphicalView makePieGraph(String question) {
+            Map<String, Integer> answerToCount = questionToAnswerToCount.get(question);
+
+            List<String> labels = new ArrayList<>();
+            List<Integer> values = new ArrayList<>();
+            for (String label : answerToCount.keySet()) {
+                if (answerToCount.get(label) != 0) {
+                    Log.d("StatsActivity", "label: " + label);
+                    Log.d("StatsActivity", "value: " + answerToCount.get(label));
+                    labels.add(label);
+                    values.add(answerToCount.get(label));
+                }
+            }
+
+            int[] colors = {Color.RED, Color.GREEN, Color.BLUE, Color.YELLOW, Color.MAGENTA, Color.CYAN, Color.GRAY, Color.DKGRAY};
+
+            // Instantiating CategorySeries to plot Pie Chart
+            CategorySeries distributionSeries = new CategorySeries(question);
+            for (int i = 0; i < labels.size(); i++) {
+                // Adding a slice with its values and name to the Pie Chart
+                distributionSeries.add(labels.get(i), values.get(i));
+            }
+
+            // Instantiating a renderer for the Pie Chart
+            DefaultRenderer defaultRenderer = new DefaultRenderer();
+            for (int i = 0; i < labels.size(); i++) {
+                SimpleSeriesRenderer seriesRenderer = new SimpleSeriesRenderer();
+                seriesRenderer.setColor(colors[i]);
+                //Adding colors to the chart
+                defaultRenderer.setBackgroundColor(Color.BLACK);
+                defaultRenderer.setApplyBackgroundColor(true);
+                // Adding a renderer for a slice
+                defaultRenderer.addSeriesRenderer(seriesRenderer);
+            }
+
+            defaultRenderer.setMargins(new int[] {50, 0, 0, 0});
+            defaultRenderer.setChartTitle(question);
+            defaultRenderer.setChartTitleTextSize(50);
+            defaultRenderer.setZoomButtonsVisible(false);
+            defaultRenderer.setDisplayValues(true);
+            defaultRenderer.setClickEnabled(false);
+            defaultRenderer.setExternalZoomEnabled(false);
+            defaultRenderer.setShowLabels(true);
+            defaultRenderer.setLabelsTextSize(50);
+            defaultRenderer.setLabelsColor(Color.WHITE);
+            defaultRenderer.setPanEnabled(false);
+            defaultRenderer.setZoomEnabled(false);
+            defaultRenderer.setShowLegend(false);
+
+
+            return ChartFactory.getPieChartView(getActivity(), distributionSeries, defaultRenderer);
+        }
+
         private GraphicalView makeBarGraph(String question) {
             Map<String, Integer> answerToCount = questionToAnswerToCount.get(question);
 
@@ -354,49 +402,6 @@ public class StatsActivity extends Activity implements NavigationDrawerFragment.
 
             // return chart object
             return ChartFactory.getBarChartView(getActivity(), dataset, renderer, BarChart.Type.DEFAULT);
-        }
-
-        private GraphicalView makePieGraph(String question) {
-            Map<String, Integer> answerToCount = questionToAnswerToCount.get(question);
-
-            List<String> labels = new ArrayList<>();
-            List<Integer> values = new ArrayList<>();
-            for (String label : answerToCount.keySet()) {
-                if (answerToCount.get(label) != 0) {
-                    Log.d("StatsActivity", "label: " + label);
-                    Log.d("StatsActivity", "value: " + answerToCount.get(label));
-                    labels.add(label);
-                    values.add(answerToCount.get(label));
-                }
-            }
-
-            int[] colors = {Color.RED, Color.YELLOW, Color.GREEN, Color.BLUE, Color.GRAY, Color.CYAN, Color.BLACK, Color.DKGRAY, Color.MAGENTA, Color.WHITE};
-
-            // Instantiating CategorySeries to plot Pie Chart
-            CategorySeries distributionSeries = new CategorySeries(question);
-            for (int i = 0; i < labels.size(); i++) {
-                // Adding a slice with its values and name to the Pie Chart
-                distributionSeries.add(labels.get(i), values.get(i));
-            }
-
-            // Instantiating a renderer for the Pie Chart
-            DefaultRenderer defaultRenderer = new DefaultRenderer();
-            for (int i = 0; i < labels.size(); i++) {
-                SimpleSeriesRenderer seriesRenderer = new SimpleSeriesRenderer();
-                seriesRenderer.setColor(colors[i]);
-                //Adding colors to the chart
-                defaultRenderer.setBackgroundColor(Color.BLACK);
-                defaultRenderer.setApplyBackgroundColor(true);
-                // Adding a renderer for a slice
-                defaultRenderer.addSeriesRenderer(seriesRenderer);
-            }
-
-            defaultRenderer.setChartTitle(question);
-            defaultRenderer.setChartTitleTextSize(100);
-            defaultRenderer.setZoomButtonsVisible(false);
-
-
-            return ChartFactory.getPieChartView(getActivity(), distributionSeries, defaultRenderer);
         }
     }
 
