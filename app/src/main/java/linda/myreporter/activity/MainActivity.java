@@ -48,25 +48,25 @@ public class MainActivity extends ListActivity {
         updateUI();
 
         // todo: move to settings
-        findViewById(R.id.clear_db_button).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-                builder.setTitle("Confirm Delete Database");
-                builder.setMessage("Are you sure you want to clear all your previously answered questions?");
-                builder.setPositiveButton("YES", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        SQLiteDatabase db = questionsHelper.getWritableDatabase();
-                        questionsHelper.onUpgrade(db, 1, 1);
-                        MainActivity.this.updateUI();
-                    }
-                });
-                builder.setNegativeButton("NO", null);
-                builder.create().show();
-            }
-        });
-        startService(new Intent(this, NotificationService.class));
+//        findViewById(R.id.clear_db_button).setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+//                builder.setTitle("Confirm Delete Database");
+//                builder.setMessage("Are you sure you want to clear all your previously answered questions?");
+//                builder.setPositiveButton("YES", new DialogInterface.OnClickListener() {
+//                    @Override
+//                    public void onClick(DialogInterface dialog, int which) {
+//                        SQLiteDatabase db = questionsHelper.getWritableDatabase();
+//                        questionsHelper.onUpgrade(db, 1, 1);
+//                        MainActivity.this.updateUI();
+//                    }
+//                });
+//                builder.setNegativeButton("NO", null);
+//                builder.create().show();
+//            }
+//        });
+//        startService(new Intent(this, NotificationService.class));
     }
 
     @Override
@@ -147,6 +147,5 @@ public class MainActivity extends ListActivity {
         this.setListAdapter(listAdapter);
 
         numEntries = DatabaseUtils.queryNumEntries(db, QuestionsDatabase.TABLE);
-        findViewById(R.id.clear_db_button).setEnabled(numEntries > 0);
     }
 }

@@ -25,13 +25,4 @@
         android:drawSelectorOnTop="false">
     </ListView>
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/clear_db"
-        android:id="@+id/clear_db_button"
-        android:layout_below="@android:id/list"
-        android:layout_centerHorizontal="true" />
-
-
 </RelativeLayout>
